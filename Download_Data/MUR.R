@@ -37,7 +37,7 @@ download_MUR_1km <- function(file_date, lon_range, lat_range){
 
 # Download all dates
 MUR_EC <- plyr::ldply(seq(as.Date("2002-06-01"), as.Date("2021-03-04"), by = "day"), download_MUR_1km,
-                       .parallel = F, lon_range = c(20, 35), lat_range = c(-27.5, -37.5))
+                       .parallel = F, lon_range = c(20, 35), lat_range = c(-37.5, -27.5))
 
 write_csv(MUR_EC, "Data/MUR_EC.csv")
 
