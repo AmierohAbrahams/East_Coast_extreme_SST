@@ -77,86 +77,35 @@ cols15 <- c("#002b27", "#003a35", "#004943", "#005852", "#006861",
 # library(rgdal)
 # library(sp)
 # library(dplyr)
-#
-# file_in <- "/Users/ajsmit/spatial/Natural_Earth_Data/SR_HR/SR_HR.tif"
-# dem <- raster(file_in)
-#
-# # Prepare for ggplot2 (long format) and tidy up a bit
-# dem_df <- as_tibble(as.data.frame(dem, xy = TRUE))
-# names(dem_df) <- c("lon", "lat", "z")
-# rm(dem)
-xlim_AC <- c(-1.875, 53.125)
-ylim_AC <- c(-52.5, -12.5)
-# dem_AC <- dem_df %>%
-#   filter(lon >= xlim_AC[1] & lon <=xlim_AC[2]) %>%
-#   filter(lat >= ylim_AC[1] & lat <=ylim_AC[2])
 
+# Bathy data
+bathyDir <- "/Volumes/Kuroshio/spatial/GEBCO_2014_Grid/csv"
+bathy <- data.table::fread(paste0(bathyDir, "/", "AC_bathy.csv"))
 
-# Find the subregion box extents ------------------------------------------
-
-bx <- read.csv2("../setup/subRegions.csv")
-AC.bx <- c(bx[1:9, c(4:7)])
-BC.bx <- c(bx[10:18, c(4:7)])
-EAC.bx <- c(bx[19:27, c(4:7)])
-KC.bx <- c(bx[28:36, c(4:7)])
-GS.bx <- c(bx[37:45, c(4:7)])
+# Zones of influence
+load("../data/setup/AC-mask_polys.RData")
+mke <- fortify(mask.list$mke)
+eke <- fortify(mask.list$eke)
+int <- fortify(mask.list$int)
 
 
 # Set the default plot options --------------------------------------------
 
-AC.layers = list(
+xlim_AC <- range(bathy$lon)
+ylim_AC <- range(bathy$lat)
+
+AC_layers = list(
+  geom_contour(
+    data = bathy, aes(x = lon, y = lat, z = z),
+    col = "black", size = 0.15, breaks = c(-500, -1000, -2000),
+    show.legend = FALSE, global.breaks = FALSE
+  ),
   geom_vline(xintercept = seq(10, 45, 5), linetype = "dotted", size = 0.2, colour = "grey40"),
   geom_hline(yintercept = seq(-45, -20, 5), linetype = "dotted", size = 0.2, colour = "grey40"),
   geom_polygon(data = shore, aes(x = X, y = Y, group = PID),
                colour = "#162b34", fill = "#162b34", size = 0.2),
-  coord_fixed(ratio = 1, xlim = c(-1.875, 53.125), ylim = c(-52.5, -12.5), expand = TRUE),
+  coord_fixed(ratio = 1, xlim = xlim_AC, ylim = ylim_AC, expand = TRUE),
   scale_x_continuous(expand = c(0, 0), labels = scales::unit_format(unit = "°E", sep = ""), breaks = c(10, 20, 30, 40)),
   scale_y_continuous(expand = c(0, 0), labels = scales::unit_format(unit = "°S", sep = ""), breaks = c(-45, -35, -25)),
   labs(x = NULL, y = NULL)
 )
-
-BC.layers = list(
-  geom_vline(xintercept = seq(300, 335, 5), linetype = "dotted", size = 0.2, colour = "grey40"),
-  geom_hline(yintercept = seq(-40, -10, 5), linetype = "dotted", size = 0.2, colour = "grey40"),
-  geom_polygon(data = shore, aes(x = X, y = Y, group = PID),
-               colour = "#162b34", fill = "#162b34", size = 0.2),
-  coord_fixed(ratio = 1, xlim = c(290, 345), ylim = c(-45, -5), expand = TRUE),
-  scale_x_continuous(expand = c(0, 0), labels = scales::unit_format(unit = "°E", sep = ""), breaks = c(300, 310, 320, 330)),
-  scale_y_continuous(expand = c(0, 0), labels = scales::unit_format(unit = "°S", sep = ""), breaks = c(-40, -30, -20, -10)),
-  labs(x = NULL, y = NULL)
-)
-
-EAC.layers <- list(
-  geom_vline(xintercept = c(145, 150, 155, 160), linetype = "dotted", size = 0.2, colour = "grey40"),
-  geom_hline(yintercept = seq(-40, -15, 5), linetype = "dotted", size = 0.2, colour = "grey40"),
-  geom_polygon(data = shore, aes(x = X, y = Y, group = PID),
-               colour = "#162b34", fill = "#162b34", size = 0.2),
-  coord_fixed(ratio = 1, xlim = c(125, 180), ylim = c(-48.75, -8.75), expand = TRUE),
-  scale_x_continuous(expand = c(0, 0), labels = scales::unit_format(unit = "°E", sep = ""), breaks = c(145, 155)),
-  scale_y_continuous(expand = c(0, 0), labels = scales::unit_format(unit = "°S", sep = ""), breaks = c(-40, -30, -20)),
-  labs(x = NULL, y = NULL)
-)
-
-KC.layers <- list(
-  geom_vline(xintercept = seq(125, 170, 5), linetype = "dotted", size = 0.2, colour = "grey40"),
-  geom_hline(yintercept = seq(20, 45, 5), linetype = "dotted", size = 0.2, colour = "grey40"),
-  geom_polygon(data = shore, aes(x = X, y = Y, group = PID),
-               colour = "#162b34", fill = "#162b34", size = 0.2),
-  coord_fixed(ratio = 1, xlim = c(120, 175), ylim = c(12.5, 52.5), expand = TRUE),
-  scale_x_continuous(expand = c(0, 0), labels = scales::unit_format(unit = "°E", sep = ""), breaks = c(130, 140, 150, 160, 170)),
-  scale_y_continuous(expand = c(0, 0), labels = scales::unit_format(unit = "°N", sep = ""), breaks = c(20, 30, 40)),
-  labs(x = NULL, y = NULL)
-)
-
-GS.layers <- list(
-  geom_vline(xintercept = seq(270, 320, 5), linetype = "dotted", size = 0.2, colour = "grey40"),
-  geom_hline(yintercept = seq(20, 50, 5), linetype = "dotted", size = 0.2, colour = "grey40"),
-  geom_polygon(data = shore, aes(x = X, y = Y, group = PID),
-               colour = "#162b34", fill = "#162b34", size = 0.2),
-  coord_fixed(ratio = 1, xlim = c(267.5, 322.5), ylim = c(15, 55), expand = TRUE),
-  scale_x_continuous(expand = c(0, 0), labels = scales::unit_format(unit = "°E", sep = ""), breaks = c(275, 285, 295, 305, 315)),
-  scale_y_continuous(expand = c(0, 0), labels = scales::unit_format(unit = "°N", sep = ""), breaks = c(20, 30, 40, 50)),
-  labs(x = NULL, y = NULL)
-)
-
-

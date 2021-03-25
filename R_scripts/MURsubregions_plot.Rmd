@@ -13,171 +13,46 @@ library(data.table)
 library(dplyr)
 library(ggplot2)
 library(scales)
-source("../setup/plot.layers.R")
-source("../setup/functions.R")
-```
-
-## Options for calculations
-
-```{r}
-region <- "AC"
-MODE <- 1
-subset <- TRUE
-tag <- "bbox-v4.4"
+source("plot_layers.R")
+source("MURregionDefinition.R")
+source("plot_theme.R")
 ```
 
 ## Specify the data to use
 
 ```{r message=FALSE, warning=FALSE}
-# Bathy data
-bathyDir <- "/Volumes/Kuroshio/spatial/GEBCO_2014_Grid/csv"
-bathy <- data.table::fread(paste0(bathyDir, "/", region, "_bathy.csv"))
 
-# Zones of influence
-load(paste0("../masks/", region, "-mask_polys.RData"))
-mke <- fortify(mask.list$mke)
-eke <- fortify(mask.list$eke)
-int <- fortify(mask.list$int)
-
-mca.base <- "-MCA-bbox-v4.4"
-dir <- "/Volumes/Kuroshio/spatial/processed/WBC/misc_results/"
-mca.data <- paste0(dir, region, mca.base, ".Rdata")
-namestem <- substr(basename(mca.data), 1, nchar(basename(mca.data)) - 6)
-csv.data <- "-MCA-data-2013-01-01-2017-12-31-bbox-v4.csv"
-csv.name <- paste0(dir, region, csv.data)
-output.dir <- "/Users/ajsmit/Dropbox/R/WBCs/MCA"
 ```
 
 ## Create a function for the plots
 
+OISST region: -36.25 to -27.5 degrees South and 20 to 35 degrees East
+
 ```{r}
-theplot <- function(region, MODE, subset = TRUE) {
+ggplot() +
+  geom_rect(aes(xmin = 15, xmax = 35, ymin = -36.25, ymax = -27.5),
+            fill = "azure4") +
+  geom_rect(aes(xmin = bbox$region1[3], xmax = bbox$region1[4],
+                ymin = bbox$region1[1], ymax = bbox$region1[2]), fill = "azure") +
+  geom_rect(aes(xmin = bbox$region2[3], xmax = bbox$region2[4],
+                ymin = bbox$region2[1], ymax = bbox$region2[2]), fill = "azure") +
+  geom_rect(aes(xmin = bbox$region3[3], xmax = bbox$region3[4],
+                ymin = bbox$region3[1], ymax = bbox$region3[2]), fill = "azure") +
+  get("AC_layers") +
+  # geom_polygon(
+  #   data = int, aes(long, lat, group = group),
+  #   fill = NA, colour = "#F5001D", size = 0.6
+  # ) +
+  geom_polygon(
+    data = mke, aes(long, lat, group = group),
+    fill = "red3", colour = NA, size = 0.3, alpha = 0.3
+  ) +
+  geom_polygon(
+    data = eke, aes(long, lat, group = group),
+    fill = NA, colour = "#0389A2", size = 0.45
+  ) +
+  labs(title = "OISST, AVISO, and MUR data regions") +
+  theme_map()
 
-  load(mca.data)
-
-  df <- fread(csv.name)[t == t[1], .(lon, lat)]
-  
-  df[, `:=`(
-    EKE = mca$u[,MODE],
-    Exceedance = mca$v[,MODE]
-  )]
-
-  mca_time <- tibble(t = c(data.table::fread(csv.name)[!duplicated(t), .(t)])$t,
-                     A = as.vector(scale(mca$A[,MODE]/sqrt(mca$Lambda[MODE]))),
-                     B = as.vector(scale(mca$B[,MODE]/sqrt(mca$Lambda[MODE]))))
-
-  legend_title <- paste("Mode", MODE, sep = " ")
-  
-  colorspace::diverging_hcl(7, palette = "Blue-Red 2", h = c(210, 360),
-                l = c(30, 100), power = 0.7, register = "BuRd")
-  colorspace::diverging_hcl(7, h = c(210, 360), c = c(120, 80), l = 50, register = "psych")
-  colorspace::diverging_hcl(9, palette = "Blue-Red", h = c(200, 340),
-                l = c(40, 110), power = 0.8, register = "BuPu1") #
-  colorspace::diverging_hcl(7, palette = "Blue-Red", h = c(250, 70),
-                l = c(50, 120), power = 0.8, register = "BuBr")
-  
-  cols <- rev(c("#c30b12", "#f61320", "#fe4d1f", "#ff8719", "#feb220",
-            "#feb220", "#fef4cc", "#e4f7fb", "#b7edfa", "#77def8",
-            "#17c0e7", "#0092cc", "#0063a7", "#003e78")) # Zhang et al (2019) - MCA.pdf
-  
-  cols2 <- c("#591992", "#7a51ac", "#877ebf", "#959acb", "#b4b4d8",
-              "#0180c1", "#00a6d3", "#59c6e2", "#fefffe", "#fcc851",
-              "#ee9039", "#e9aab1", "#ff7caf", "#df2d1c", "#d30606",
-              "#b00303", "#800302") # Gu et al (2018) - MCA.pdf
-  
-  .themap <- function(region, legend, fill, plot_title, title_colour) {
-
-    ggplot() +
-      geom_raster(data = df, aes(fill = get(fill), x = lon, y = lat)) +
-      # colorspace::scale_fill_continuous_diverging(palette = "BuBr",
-      #                                             na.value = "#011789",
-      #                                             rev = TRUE) +
-      scale_fill_gradientn(colours = cols,
-                           values = rescale(c(min(df[, get(fill)]), 0 ,
-                                              max(df[, get(fill)])))) +
-      guides(
-        alpha = "none",
-        size = "none",
-        fill = guide_colourbar(
-          title = legend,
-          frame.colour = "black",
-          frame.linewidth = 0.4,
-          ticks.colour = "black",
-          barheight = unit(20, units = "mm"),
-          barwidth = unit(2.5, units = "mm"),
-          draw.ulim = F,
-          title.position = "top",
-          title.hjust = 0.5,
-          label.hjust = 0.5
-        )
-      ) +
-      geom_contour(
-        data = bathy, aes(x = lon, y = lat, z = z),
-        col = "black", size = 0.15, breaks = c(-500, -1000, -2000),
-        show.legend = FALSE, global.breaks = FALSE
-      ) +
-      geom_polygon(
-        data = int, aes(long, lat, group = group),
-        fill = NA, colour = "#F5001D", size = 0.6
-      ) +
-      # geom_polygon(
-      #   data = mke, aes(long, lat, group = group),
-      #   fill = NA, colour = "red3", size = 0.3
-      # ) +
-      geom_polygon(
-        data = eke, aes(long, lat, group = group),
-        fill = NA, colour = "#0389A2", size = 0.45
-      ) +
-      labs(title = plot_title) +
-      get(paste0(region, ".layers")) +
-      theme_map() +
-      theme(plot.title = element_text(color = title_colour),
-            legend.position = c(0.135, 0.7))
-  }
-
-  EKE.plt <- .themap(region = region, legend = legend_title, fill = "EKE",
-                     plot_title = "EKE anomaly", title_colour = "#0389A2")
-  EX.plt <- .themap(region = region, legend = legend_title, fill = "Exceedance",
-                    plot_title = "Exceedance anomaly", title_colour = "#F5001D")
-
-  MCA.time <- ggplot(mca_time, aes(x = t)) +
-    geom_line(aes(y = A), col = "#0389A2") +
-    geom_line(aes(y = B), col = "#F5001D") +
-    labs(title = paste0("SCF = ", round(mca$sq_cov_frac[MODE], 3) * 100,
-                        "%; r = ", round(cor(mca_time$A, mca_time$B, method = "pearson"), 2)),
-         x = NULL, y = "Coefficient") +
-    theme_plot()
-
-  combo.plt <- ggpubr::ggarrange(
-    ggpubr::ggarrange(
-      EKE.plt,
-      EX.plt,
-      nrow = 1, ncol = 2
-    ),
-    MCA.time,
-    nrow = 2, ncol = 1,
-    heights = c(2, 0.9)
-  )
-
-  out.name <- paste0(output.dir, "/", region, "-MCA-Mode-", MODE, "-", tag, ".jpg")
-  ggplot2::ggsave(out.name,
-                  scale = 0.55, dpi = 300,
-                  width = 8 * 4.040, height = 6 * 3.092, units = "cm")
-
-  return(combo.plt)
-}
-```
-
-## Create the plots
-
-```{r message=FALSE, warning=FALSE}
-theplot(region = region, MODE = 1)
-```
-
-```{r message=FALSE, warning=FALSE}
-theplot(region = region, MODE = 2)
-```
-
-```{r message=FALSE, warning=FALSE}
-theplot(region = region, MODE = 3)
+ggsave("study_region.png", scale = 1.2, height = 5, width = 7)
 ```
