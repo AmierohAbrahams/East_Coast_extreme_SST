@@ -31,13 +31,17 @@ OISST region: -36.25 to -27.5 degrees South and 20 to 35 degrees East
 ```{r}
 ggplot() +
   geom_rect(aes(xmin = 15, xmax = 35, ymin = -36.25, ymax = -27.5),
-            fill = "azure4") +
+            colour = "royalblue3", fill = NA) +
   geom_rect(aes(xmin = bbox$region1[3], xmax = bbox$region1[4],
-                ymin = bbox$region1[1], ymax = bbox$region1[2]), fill = "azure") +
+                ymin = bbox$region1[1], ymax = bbox$region1[2]), colour = "royalblue1", fill = NA) +
   geom_rect(aes(xmin = bbox$region2[3], xmax = bbox$region2[4],
-                ymin = bbox$region2[1], ymax = bbox$region2[2]), fill = "azure") +
+                ymin = bbox$region2[1], ymax = bbox$region2[2]), colour = "royalblue1", fill = NA) +
   geom_rect(aes(xmin = bbox$region3[3], xmax = bbox$region3[4],
-                ymin = bbox$region3[1], ymax = bbox$region3[2]), fill = "azure") +
+                ymin = bbox$region3[1], ymax = bbox$region3[2]), colour = "royalblue1", fill = NA) +
+  geom_rect(aes(xmin = bbox$region4[3], xmax = bbox$region4[4],
+                ymin = bbox$region4[1], ymax = bbox$region4[2]), colour = "royalblue1", fill = NA) +
+  geom_rect(aes(xmin = bbox$region5[3], xmax = bbox$region5[4],
+                ymin = bbox$region5[1], ymax = bbox$region5[2]), colour = "royalblue1", fill = NA) +
   get("AC_layers") +
   # geom_polygon(
   #   data = int, aes(long, lat, group = group),
