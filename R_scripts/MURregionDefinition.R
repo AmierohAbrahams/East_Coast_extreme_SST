@@ -1,11 +1,11 @@
 # regionDefinition.R
 
 # MUR subreggions
-bbox <- data.frame(region1 = c(-34.9, -32.3, 17.6, 20), # St Helena Bay to Cape Agulhas
-                   region2 = c(-34.9, -33.9, 20, 24.6), # Cape Agulhas to St Francis
-                   region3 = c(-34.5, -32.8, 24.6, 28.1), # Cape St Francis to East London
-                   region4 = c(-33.7, -31.7, 28.1, 30.1), # East London to Port Edward
-                   region5 = c(-31.2, -29.8, 30.1, 31.7), # Port Edward to Durban
+bbox <- data.frame(region5 = c(-34.9, -32.3, 17.6, 20), # St Helena Bay to Cape Agulhas Region5
+                   region4 = c(-34.9, -33.9, 20, 24.6), # Cape Agulhas to St Francis Region4
+                   region3 = c(-34.5, -32.8, 24.6, 28.1), # Cape St Francis to East London Region3
+                   region2 = c(-33.7, -31.7, 28.1, 30.1), # East London to Port Edward Region2
+                   region1 = c(-31.2, -29.8, 30.1, 31.7), # Port Edward to Durban Region1
                    row.names = c("latmin", "latmax", "lonmin", "lonmax"))
 
 # MUR Download

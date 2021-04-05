@@ -42,7 +42,7 @@ ggplot() +
                 ymin = bbox$region4[1], ymax = bbox$region4[2]), colour = "royalblue1", fill = NA) +
   geom_rect(aes(xmin = bbox$region5[3], xmax = bbox$region5[4],
                 ymin = bbox$region5[1], ymax = bbox$region5[2]), colour = "royalblue1", fill = NA) +
-  get("AC_layers") +
+  get("AC_layers_large") +
   # geom_polygon(
   #   data = int, aes(long, lat, group = group),
   #   fill = NA, colour = "#F5001D", size = 0.6

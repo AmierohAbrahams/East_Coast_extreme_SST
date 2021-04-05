@@ -15,9 +15,7 @@ theme_map <- function(...) {
     theme(
       axis.text = element_text(size = 10, color = "black"),
       axis.title = element_text(size = 10, color = "black"),
-      legend.background = element_rect(colour = "black", size = 0.2),
-      legend.position = c(0.093, 0.70),
-      panel.background = element_rect(colour = NA, fill = "grey95"),
+      # panel.background = element_rect(colour = NA, fill = "grey95"),
       panel.grid.major = element_line("grey40", linetype = "dotted", size = 0.2),
       panel.grid.minor = element_line("grey40", linetype = "dotted", size = 0.2),
       ...
@@ -85,7 +83,7 @@ int <- fortify(mask.list$int)
 
 # Set the default plot options --------------------------------------------
 
-AC_layers = list(
+AC_layers_large = list(
   geom_contour(
     data = bathy, aes(x = lon, y = lat, z = z),
     col = "black", size = 0.15, breaks = c(-500, -1000, -2000),
@@ -97,5 +95,28 @@ AC_layers = list(
   coord_sf(xlim = xlim_AC, ylim = ylim_AC, expand = FALSE),
   scale_x_continuous(expand = c(0, 0), labels = scales::unit_format(unit = "°E", sep = ""), breaks = c(10, 20, 30, 40)),
   scale_y_continuous(expand = c(0, 0), labels = scales::unit_format(unit = "°S", sep = ""), breaks = c(-45, -35, -25)),
+  labs(x = NULL, y = NULL)
+)
+
+AC_layers_zoomed = list(
+  geom_contour(
+    data = bathy, aes(x = lon, y = lat, z = z),
+    col = "black", size = 0.15, breaks = c(-500, -1000, -2000),
+    show.legend = FALSE, global.breaks = FALSE
+  ),
+  geom_rect(aes(xmin = bbox$region1[3], xmax = bbox$region1[4],
+                ymin = bbox$region1[1], ymax = bbox$region1[2]), colour = "royalblue1", fill = NA),
+  geom_rect(aes(xmin = bbox$region2[3], xmax = bbox$region2[4],
+                ymin = bbox$region2[1], ymax = bbox$region2[2]), colour = "royalblue1", fill = NA),
+  geom_rect(aes(xmin = bbox$region3[3], xmax = bbox$region3[4],
+                ymin = bbox$region3[1], ymax = bbox$region3[2]), colour = "royalblue1", fill = NA),
+  geom_rect(aes(xmin = bbox$region4[3], xmax = bbox$region4[4],
+                ymin = bbox$region4[1], ymax = bbox$region4[2]), colour = "royalblue1", fill = NA),
+  geom_rect(aes(xmin = bbox$region5[3], xmax = bbox$region5[4],
+                ymin = bbox$region5[1], ymax = bbox$region5[2]), colour = "royalblue1", fill = NA),
+  geom_sf(data = world, colour = "#162b34", fill = "#162b34", size = 0.2),
+  # coord_sf(xlim = xlim_AC, ylim = ylim_AC, expand = FALSE),
+  scale_x_continuous(expand = c(0, 0), labels = scales::unit_format(unit = "°E", sep = "")),
+  scale_y_continuous(expand = c(0, 0), labels = scales::unit_format(unit = "°S", sep = "")),
   labs(x = NULL, y = NULL)
 )
