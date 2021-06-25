@@ -25,7 +25,7 @@ SACTN_port <- SACTN_sites %>%
   dplyr::select(-index)
 
 # Detect the events in a time series
-mhw_port <- ts2clm(SACTN_port, climatologyPeriod = c("2011-10-26", "2021-06-16"))
+mhw_port <- ts2clm(SACTN_port, climatologyPeriod = c("2012-01-01", "2021-02-26"))
 mhw_port_event <- detect_event(mhw_port)
 
 # View just a few metrics
@@ -42,10 +42,9 @@ seasons_port <- port_event %>%
   ungroup() %>% 
   mutate(month = month(date_start, abbr = T, label = T),
          year = year(date_start)) %>% 
-  mutate(season = ifelse(month %in% c("Dec, Jan", "Feb", "Mar"), "Summer",        
-                         ifelse(month %in% c("Apr", "May", "Jun"), "Autumn",
-                                ifelse(month %in% c("Jul", "Aug", "Sep"), "Winter",
-                                       ifelse(month %in% c("Oct", "Nov"), "Spring","Error"))))) %>% 
+  mutate(season = ifelse(month %in% c("Dec", "Jan", "Feb", "Mar"), "Summer",        
+                         ifelse(month %in% c("Apr", "May", "Jun", "Jul"), "Autumn",
+                                ifelse(month %in% c("Aug", "Sep", "Oct", "Nov"), "Spring","Error")))) %>% 
   filter(season == "Summer") %>% 
   mutate(site = "Port St Francis")
 
@@ -60,7 +59,7 @@ SACTN_seaview <- SACTN_sites %>%
   dplyr::select(-index)
 
 # Detect the events in a time series
-mhw_seaview <- ts2clm(SACTN_seaview, climatologyPeriod = c("2011-10-12", "2021-02-26"))
+mhw_seaview <- ts2clm(SACTN_seaview, climatologyPeriod = c("2012-01-01", "2021-02-26"))
 mhw_seaview_event <- detect_event(mhw_seaview)
 
 # View just a few metrics
@@ -78,10 +77,9 @@ seasons_seaview <- seaview_event %>%
   ungroup() %>% 
   mutate(month = month(date_start, abbr = T, label = T),
          year = year(date_start)) %>% 
-  mutate(season = ifelse(month %in% c("Dec, Jan", "Feb", "Mar"), "Summer",        
-                         ifelse(month %in% c("Apr", "May", "Jun"), "Autumn",
-                                ifelse(month %in% c("Jul", "Aug", "Sep"), "Winter",
-                                       ifelse(month %in% c("Oct", "Nov"), "Spring","Error"))))) %>% 
+  mutate(season = ifelse(month %in% c("Dec", "Jan", "Feb", "Mar"), "Summer",        
+                         ifelse(month %in% c("Apr", "May", "Jun", "Jul"), "Autumn",
+                                ifelse(month %in% c("Aug", "Sep", "Oct", "Nov"), "Spring","Error")))) %>% 
   filter(season == "Summer") %>% 
   mutate(site = "Seaview")
 
@@ -96,7 +94,7 @@ SACTN_Thyspunt <- SACTN_sites %>%
   dplyr::select(-index)
 
 # Detect the events in a time series
-mhw_Thyspunt <- ts2clm(SACTN_Thyspunt, climatologyPeriod = c("2011-11-11", "2021-02-26"))
+mhw_Thyspunt <- ts2clm(SACTN_Thyspunt, climatologyPeriod = c("2012-01-01", "2021-02-26"))
 mhw_Thyspunt_event <- detect_event(mhw_Thyspunt)
 
 # View just a few metrics
@@ -114,10 +112,9 @@ seasons_Thyspunt <- Thyspunt_event %>%
   ungroup() %>% 
   mutate(month = month(date_start, abbr = T, label = T),
          year = year(date_start)) %>% 
-  mutate(season = ifelse(month %in% c("Dec, Jan", "Feb", "Mar"), "Summer",        
-                         ifelse(month %in% c("Apr", "May", "Jun"), "Autumn",
-                                ifelse(month %in% c("Jul", "Aug", "Sep"), "Winter",
-                                       ifelse(month %in% c("Oct", "Nov"), "Spring","Error"))))) %>% 
+  mutate(season = ifelse(month %in% c("Dec", "Jan", "Feb", "Mar"), "Summer",        
+                         ifelse(month %in% c("Apr", "May", "Jun", "Jul"), "Autumn",
+                                ifelse(month %in% c("Aug", "Sep", "Oct", "Nov"), "Spring","Error")))) %>% 
   filter(season == "Summer") %>% 
   mutate(site = "Thyspunt")
 
@@ -129,7 +126,7 @@ save(MHW, file = "MHW.RData")
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 
 ## Marine coldspells and climatology
-mcs_port <- ts2clm(SACTN_port, climatologyPeriod = c("2012-02-01", "2021-03-31"), pctile = 10)
+mcs_port <- ts2clm(SACTN_port, climatologyPeriod = c("2012-01-01", "2021-02-26"), pctile = 10)
 mcs_port_event <- detect_event(mcs_port, coldSpells = TRUE)
 
 # Climatology
@@ -148,10 +145,9 @@ seasons_port_mcs <- mcs_port_event %>%
   ungroup() %>% 
   mutate(month = month(date_start, abbr = T, label = T),
          year = year(date_start)) %>% 
-  mutate(season = ifelse(month %in% c("Dec, Jan", "Feb", "Mar"), "Summer",        
-                         ifelse(month %in% c("Apr", "May", "Jun"), "Autumn",
-                                ifelse(month %in% c("Jul", "Aug", "Sep"), "Winter",
-                                       ifelse(month %in% c("Oct", "Nov"), "Spring","Error"))))) %>% 
+  mutate(season = ifelse(month %in% c("Dec", "Jan", "Feb", "Mar"), "Summer",        
+                         ifelse(month %in% c("Apr", "May", "Jun", "Jul"), "Autumn",
+                                ifelse(month %in% c("Aug", "Sep", "Oct", "Nov"), "Spring","Error")))) %>% 
   filter(season == "Summer") %>% 
   mutate(site = "Port St Francis")
 
@@ -166,7 +162,7 @@ SACTN_seaview <- SACTN_sites %>%
   dplyr::select(-index)
 
 # Detect the events in a time series
-mcs_seaview <- ts2clm(SACTN_seaview, climatologyPeriod = c("2011-10-12", "2021-02-26"), pctile = 10)
+mcs_seaview <- ts2clm(SACTN_seaview, climatologyPeriod = c("2012-01-01", "2021-02-26"), pctile = 10)
 mcs_seaview_event <- detect_event(mcs_seaview, coldSpells = TRUE)
 
 # Climatology
@@ -183,10 +179,9 @@ seasons_seaview_mcs <- mcs_seaview_event %>%
   ungroup() %>% 
   mutate(month = month(date_start, abbr = T, label = T),
          year = year(date_start)) %>% 
-  mutate(season = ifelse(month %in% c("Dec, Jan", "Feb", "Mar"), "Summer",        
-                         ifelse(month %in% c("Apr", "May", "Jun"), "Autumn",
-                                ifelse(month %in% c("Jul", "Aug", "Sep"), "Winter",
-                                       ifelse(month %in% c("Oct", "Nov"), "Spring","Error"))))) %>% 
+  mutate(season = ifelse(month %in% c("Dec", "Jan", "Feb", "Mar"), "Summer",        
+                         ifelse(month %in% c("Apr", "May", "Jun", "Jul"), "Autumn",
+                                ifelse(month %in% c("Aug", "Sep", "Oct", "Nov"), "Spring","Error")))) %>% 
   filter(season == "Summer") %>% 
   mutate(site = "Seaview")
 
@@ -201,7 +196,7 @@ SACTN_Thyspunt <- SACTN_sites %>%
   dplyr::select(-index)
 
 # Detect the events in a time series
-mcs_Thyspunt <- ts2clm(SACTN_Thyspunt, climatologyPeriod = c("2011-11-11", "2021-02-26"),  pctile = 10)
+mcs_Thyspunt <- ts2clm(SACTN_Thyspunt, climatologyPeriod = c("2012-01-01", "2021-02-26"),  pctile = 10)
 mcs_Thyspunt_event <- detect_event(mcs_Thyspunt,  coldSpells = TRUE)
 
 # climatology
@@ -219,10 +214,9 @@ seasons_Thyspunt_mcs <- mcs_Thyspunt_event %>%
   ungroup() %>% 
   mutate(month = month(date_start, abbr = T, label = T),
          year = year(date_start)) %>% 
-  mutate(season = ifelse(month %in% c("Dec, Jan", "Feb", "Mar"), "Summer",        
-                         ifelse(month %in% c("Apr", "May", "Jun"), "Autumn",
-                                ifelse(month %in% c("Jul", "Aug", "Sep"), "Winter",
-                                       ifelse(month %in% c("Oct", "Nov"), "Spring","Error"))))) %>% 
+  mutate(season = ifelse(month %in% c("Dec", "Jan", "Feb", "Mar"), "Summer",        
+                         ifelse(month %in% c("Apr", "May", "Jun", "Jul"), "Autumn",
+                                ifelse(month %in% c("Aug", "Sep", "Oct", "Nov"), "Spring","Error")))) %>% 
   filter(season == "Summer") %>% 
   mutate(site = "Thyspunt")
 
@@ -231,5 +225,6 @@ MCS <- rbind(seasons_port_mcs, seasons_seaview_mcs, seasons_Thyspunt_mcs)
 save(MCS, file = "MCS.RData")
 
 # ------------------------------------------------------------------------------------------------------------------------
+
 
 
